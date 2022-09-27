@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>What did I drop?</title>
+</head>
+<body>
+
+<style>
+    html,body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width:  100%;
+        height: 100%;
+    }
+    textarea {
+        width:  500px;
+        height: 500px;
+    }
+</style>
+
+<textarea>
+Drop something to see what the browser
+makes of it.
+</textarea>
+
+<img id=bild>
+
+<script>
+var dropbox = document.querySelector('body');
+
+dropbox.addEventListener('dragenter', noopHandler, false);
+dropbox.addEventListener('dragexit', noopHandler, false);
+dropbox.addEventListener('dragover', noopHandler, false);
+dropbox.addEventListener('drop', drop, false);
+
+function noopHandler(evnt) {
+    evnt.stopPropagation();
+    evnt.preventDefault();
+}
+
+function info(msg) {
+    const el = document.querySelector('textarea');
+    el.value += msg + "\n";
+}
+
+function promisify(f) { return new Promise( res => f(res) ) }
+
+async function drop(evnt) {
+    console.log(evnt);
+    window.yoyo = evnt;
+    evnt.stopPropagation();
+    evnt.preventDefault(); 
+    
+    var objURL = URL.createObjectURL(evnt.dataTransfer.files[0]);
+    bild.src = objURL;
+    info(objURL);
+
+    for (var i = 0; i < evnt.dataTransfer.items.length; i++) {
+        const item = evnt.dataTransfer.items[i];
+        console.log(item);
+        info (`items[${i}]: ` + item.type);
+        const s = await promisify(item.getAsString.bind(item));
+        info(s);
+    }
+}
+
+</script>
+
+</body>
